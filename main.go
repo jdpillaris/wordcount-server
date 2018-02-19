@@ -7,6 +7,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"unicode"
 )
 
 func main() {
@@ -15,8 +16,7 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter file path: ")
 	file, _ := reader.ReadString('\n')
-	// file := "/home/jdpillaris/Documents/Workspaces/Tests/Ulventech/servlet.txt"
-	fmt.Println(file)
+	file = strings.TrimRight(file, "\r\n")
 
 	var lines []string
 	var wordCounter map[string]int
@@ -26,7 +26,6 @@ func main() {
 	wordCounter = getWordFrequency(lines)
 	mostFrequentWords = getMostFrequentWords(wordCounter, number)
 
-	// fmt.Printf("%v", mostFrequentWords)
 	fmt.Println("The", number, "most frequent words are:")
 	for _, elem := range mostFrequentWords {
 		fmt.Println("Word:", elem.Word, "; Count:", elem.Count)
@@ -58,7 +57,11 @@ func getWordFrequency(lineList []string) map[string]int {
 	var words []string
 
 	for _, line := range lineList {
-		words = strings.Fields(line)
+		isNotAlphaNumeric := func(c rune) bool {
+			return !unicode.IsLetter(c) && !unicode.IsNumber(c)
+		}
+		words = strings.FieldsFunc(line, isNotAlphaNumeric)
+
 		for _, word := range words {
 			if _, exists := wordFrequencies[word]; exists {
 				wordFrequencies[word]++
