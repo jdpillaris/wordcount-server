@@ -14,11 +14,16 @@ import (
 )
 
 func main() {
+	http.HandleFunc("/", hello)
 	http.HandleFunc("/upload", upload)
 	err := http.ListenAndServe(":9090", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
+}
+
+func hello(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome to Ulventech word counter!")
 }
 
 func upload(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +96,7 @@ func getWordFrequency(lineList []string) map[string]int {
 		words = strings.FieldsFunc(line, isNotAlphaNumeric)
 
 		for _, word := range words {
+			word = strings.ToLower(word)
 			if _, exists := wordFrequencies[word]; exists {
 				wordFrequencies[word]++
 			} else {
