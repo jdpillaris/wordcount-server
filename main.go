@@ -22,9 +22,10 @@ func main() {
 
 func upload(w http.ResponseWriter, r *http.Request) {
 	m := map[string]interface{}{}
+	t, _ := template.ParseFiles("upload.html")
 	if r.Method == "GET" {
-		t, _ := template.ParseFiles("upload.html")
-
+		t.Execute(w, nil)
+	} else {
 		var number = 10
 		// Test file
 		file := "./.store/testfile.txt"
@@ -39,7 +40,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		}
 
 		m["myList"] = mostFrequentWords
-		t.Execute(w, nil)
+		t.Execute(w, m)
 	}
 }
 
