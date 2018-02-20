@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -27,21 +28,36 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, nil)
 	} else {
 		var number = 10
-		// Test file
-		file := "./.store/testfile.txt"
+		filePath := storeFile(r)
 
-		var lines = getLines(file)
+		var lines = getLines(filePath)
 		var wordCounter = getWordFrequency(lines)
 		var mostFrequentWords = getMostFrequentWords(wordCounter, number)
-
-		fmt.Println("The", number, "most frequent words are:")
-		for _, elem := range mostFrequentWords {
-			fmt.Println("Word:", elem.Word, "; Count:", elem.Count)
-		}
 
 		m["myList"] = mostFrequentWords
 		t.Execute(w, m)
 	}
+}
+
+func storeFile(r *http.Request) string {
+	r.ParseMultipartForm(32 << 20)
+	file, handler, err := r.FormFile("uploadfile")
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	defer file.Close()
+
+	f, err := os.OpenFile("./.store/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	defer f.Close()
+	io.Copy(f, file)
+
+	filePath := "./.store/" + handler.Filename
+	return filePath
 }
 
 func getLines(filename string) []string {
