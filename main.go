@@ -28,16 +28,16 @@ func hello(w http.ResponseWriter, r *http.Request) {
 
 func upload(w http.ResponseWriter, r *http.Request) {
 	m := map[string]interface{}{}
-	t, _ := template.ParseFiles("upload.html")
+	t, _ := template.ParseFiles("assets/upload.html")
 	if r.Method == "GET" {
 		t.Execute(w, nil)
 	} else {
-		var number = 10
+		var wordsToDisplay = 10
 		filePath := storeFile(r)
 
 		var lines = getLines(filePath)
 		var wordCounter = getWordFrequency(lines)
-		var mostFrequentWords = getMostFrequentWords(wordCounter, number)
+		var mostFrequentWords = getMostFrequentWords(wordCounter, wordsToDisplay)
 
 		m["myList"] = mostFrequentWords
 		t.Execute(w, m)
@@ -48,15 +48,13 @@ func storeFile(r *http.Request) string {
 	r.ParseMultipartForm(32 << 20)
 	file, handler, err := r.FormFile("uploadfile")
 	if err != nil {
-		fmt.Println(err)
-		return ""
+		log.Fatal(err)
 	}
 	defer file.Close()
 
 	f, err := os.OpenFile("./.store/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		fmt.Println(err)
-		return ""
+		log.Fatal(err)
 	}
 	defer f.Close()
 	io.Copy(f, file)
@@ -108,26 +106,26 @@ func getWordFrequency(lineList []string) map[string]int {
 	return wordFrequencies
 }
 
-func getMostFrequentWords(wordCounter map[string]int, number int) PairList {
-	frequentWords := make(PairList, len(wordCounter))
+func getMostFrequentWords(wordCounter map[string]int, numberOfWords int) WordFrequencyList {
+	frequentWords := make(WordFrequencyList, len(wordCounter))
 	i := 0
 	for k, v := range wordCounter {
-		frequentWords[i] = Pair{k, v}
+		frequentWords[i] = WordFrequency{k, v}
 		i++
 	}
 	sort.Sort(sort.Reverse(frequentWords))
-	return frequentWords[:number]
+	return frequentWords[:numberOfWords]
 }
 
-// Pair struct
-type Pair struct {
+// WordFrequency struct
+type WordFrequency struct {
 	Word  string
 	Count int
 }
 
-// PairList : Array of Pairs
-type PairList []Pair
+// WordFrequencyList : Array of WordFrequency
+type WordFrequencyList []WordFrequency
 
-func (pairs PairList) Len() int           { return len(pairs) }
-func (pairs PairList) Less(i, j int) bool { return pairs[i].Count < pairs[j].Count }
-func (pairs PairList) Swap(i, j int)      { pairs[i], pairs[j] = pairs[j], pairs[i] }
+func (pairs WordFrequencyList) Len() int           { return len(pairs) }
+func (pairs WordFrequencyList) Less(i, j int) bool { return pairs[i].Count < pairs[j].Count }
+func (pairs WordFrequencyList) Swap(i, j int)      { pairs[i], pairs[j] = pairs[j], pairs[i] }
