@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"sort"
 	"strings"
@@ -11,20 +12,21 @@ import (
 )
 
 func main() {
+	http.HandleFunc("/upload", upload)
+	err := http.ListenAndServe(":9090", nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+}
+
+func upload(w http.ResponseWriter, r *http.Request) {
 	var number = 10
+	// Test file
+	file := "./.store/testfile.txt"
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter file path: ")
-	file, _ := reader.ReadString('\n')
-	file = strings.TrimRight(file, "\r\n")
-
-	var lines []string
-	var wordCounter map[string]int
-	var mostFrequentWords PairList
-
-	lines = getLines(file)
-	wordCounter = getWordFrequency(lines)
-	mostFrequentWords = getMostFrequentWords(wordCounter, number)
+	var lines = getLines(file)
+	var wordCounter = getWordFrequency(lines)
+	var mostFrequentWords = getMostFrequentWords(wordCounter, number)
 
 	fmt.Println("The", number, "most frequent words are:")
 	for _, elem := range mostFrequentWords {
