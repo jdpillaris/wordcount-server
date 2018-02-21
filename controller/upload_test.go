@@ -25,12 +25,18 @@ func Test_getWordFrequency(t *testing.T) {
 		"family": 1, "give": 1,
 	}
 
+	emptySentences := []string{
+		"", "", "", "",
+	}
+	wordCounterForEmptySentences := map[string]int{}
+
 	tables := []struct {
 		sentences           []string
 		expectedWordCounter map[string]int
 	}{
 		{simpleSentences, wordCounterForSimpleSentences},
 		{manySpecialChars, wordCounterForSpecialChars},
+		{emptySentences, wordCounterForEmptySentences},
 	}
 
 	for _, tt := range tables {
