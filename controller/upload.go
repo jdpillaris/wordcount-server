@@ -25,6 +25,7 @@ func (pairs WordFrequencyList) Len() int           { return len(pairs) }
 func (pairs WordFrequencyList) Less(i, j int) bool { return pairs[i].Count < pairs[j].Count }
 func (pairs WordFrequencyList) Swap(i, j int)      { pairs[i], pairs[j] = pairs[j], pairs[i] }
 
+// Upload : Copies chosen file to the local file system
 func Upload(w http.ResponseWriter, r *http.Request) {
 	m := map[string]interface{}{}
 	t, _ := template.ParseFiles("assets/upload.html")
