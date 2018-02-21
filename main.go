@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	controller "github.com/jdpillaris/ut_problem_set/server/controller"
+	controller "github.com/jdpillaris/server/controller"
 )
 
 func main() {
